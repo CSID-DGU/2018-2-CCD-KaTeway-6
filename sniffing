@@ -1,0 +1,22 @@
+def prepare_sniffing(host):
+    if os.name is 'nt':
+        print('Log[1] : OS is WINDOW')
+        sock_protocol = IPPROTO_IP
+    elif os.name is 'posix':
+        print('Log[1] : OS is POSIX')
+        sock_protocol = _select_protocol()
+    else:
+        print('Log[1] : OS isn\'t WINDOW')
+        sock_protocol = IPPROTO_ICMP
+
+    #SOCK_RAW doesn't listen for a port.
+    sniffer = socket(AF_INET, SOCK_RAW, sock_protocol)
+    sniffer.bind((host, 0))
+    sniffer.setsockopt(IPPROTO_IP, IP_HDRINCL, 1)
+    print('Log[2] : Socket Binding' + str(sniffer.getsockname()))
+
+
+    if os.name is 'nt':
+       sniffer.ioctl(SIO_RCVALL, RCVALL_ON)
+
+    return sniffer
